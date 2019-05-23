@@ -1,0 +1,14 @@
+.header {
+    z-index: 1;
+    padding: 0 20px;
+    width: 100%;
+    background: #ffffff;
+    height: 80px;
+    min-height: 80px;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    flex-direction: unset;
+    justify-content: space-between;
+    box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.16);
+}

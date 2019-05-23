@@ -1,0 +1,131 @@
+[{
+  "message": "Operators fetched successfully.",
+  "operators": [
+    {
+      "_id": "5c092dec306ba208c51dea51",
+      "name": "equals ignore case",
+      "operator": "equalsIgnoreCase",
+      "operands": "2"
+    },
+    {
+      "_id": "5ab24d25a54d75c06957f4c1",
+      "name": "doesn't match regex",
+      "operator": "regexNotMatches",
+      "operands": "2"
+    },
+    {
+      "_id": "5a8edfe7a54d758620226ca7",
+      "name": "is not a valid Date in Format",
+      "operator": "isDateNotInFormat",
+      "operands": "2"
+    },
+    {
+      "_id": "5a8ebcb4a54d758620226ca4",
+      "name": "is valid Date in Format",
+      "operator": "isDateInFormat",
+      "operands": "2"
+    },
+    {
+      "_id": "59f0cd7ef44257712a4ad261",
+      "name": "is not Email",
+      "operator": "isNotEmail",
+      "operands": "1"
+    },
+    {
+      "_id": "591ca2af6367389ddc017b21",
+      "name": "is Valid Date",
+      "operator": "isDate",
+      "operands": "1"
+    },
+    {
+      "_id": "590c4db96367382d76153ce2",
+      "name": "is Not Null",
+      "operator": "nnull",
+      "operands": "1"
+    },
+    {
+      "_id": "590c4dae6367382d76153ce1",
+      "name": "is Null",
+      "operator": "null",
+      "operands": "1"
+    },
+    {
+      "_id": "59060c15636738f0050808c1",
+      "name": "is valid URL",
+      "operator": "isURL",
+      "operands": "1"
+    },
+    {
+      "_id": "588f98f263673821fe66abbc",
+      "name": "match regex",
+      "operator": "regex",
+      "operands": "2"
+    },
+    {
+      "_id": "588f98e963673821fe66abbb",
+      "name": "is Not a Number",
+      "operator": "isNan",
+      "operands": "1"
+    },
+    {
+      "_id": "588f98e663673821fe66abba",
+      "name": "is Number",
+      "operator": "isNumber",
+      "operands": "1"
+    },
+    {
+      "_id": "588f98e363673821fe66abb9",
+      "name": "is Email",
+      "operator": "isEmail",
+      "operands": "1"
+    },
+    {
+      "_id": "588f98dd63673821fe66abb8",
+      "name": "not contains",
+      "operator": "notContains",
+      "operands": "2"
+    },
+    {
+      "_id": "588f98da63673821fe66abb7",
+      "name": "contains",
+      "operator": "contains",
+      "operands": "2"
+    },
+    {
+      "_id": "588f98d663673821fe66abb6",
+      "name": "less than",
+      "operator": "lt",
+      "operands": "2"
+    },
+    {
+      "_id": "588f98d363673821fe66abb5",
+      "name": "less than equals to",
+      "operator": "lte",
+      "operands": "2"
+    },
+    {
+      "_id": "588f98cf63673821fe66abb4",
+      "name": "greater than equals to",
+      "operator": "gte",
+      "operands": "2"
+    },
+    {
+      "_id": "588f98c763673821fe66abb3",
+      "name": "greater than",
+      "operator": "gt",
+      "operands": "2"
+    },
+    {
+      "_id": "588f98c063673821fe66abb2",
+      "name": "not equals",
+      "operator": "neq",
+      "operands": "2"
+    },
+    {
+      "_id": "588f989863673821fe66abb1",
+      "name": "equals",
+      "operator": "eq",
+      "operands": "2"
+    }
+  ]
+}]
