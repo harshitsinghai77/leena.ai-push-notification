@@ -13,7 +13,7 @@ function CustomAudience(props , ref) {
     const [option, setOption] = useState([])
 
     useEffect(() => {
-        window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce100ae6d951400100308b9/notifications/audiences')
+        window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences')
         .then(response =>  {
           setOption(response.data.audiences)
         })

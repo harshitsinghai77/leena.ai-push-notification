@@ -458,8 +458,8 @@ export default {
     },
     operators: {
         equal: {
-            label: '==',
-            labelForFormat: '==',
+            label: '===',
+            labelForFormat: '===',
             reversedOp: 'not_equal',
             mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } }),
         },
@@ -594,10 +594,10 @@ export default {
             mongoFormatOp: (field, op) => ({ [field]: { '$exists': true } }),
         },
         select_equals: {
-            label: '==',
-            labelForFormat: '==',
+            label: '===',
+            labelForFormat: '===',
             formatOp: (field, op, value, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-                return `${field} == ${value}`;
+                return `${field} === ${value}`;
             },
             mongoFormatOp: (field, op, value) => ({ [field]: { '$eq': value } }),
             reversedOp: 'select_not_equals',
@@ -615,7 +615,7 @@ export default {
             label: 'Any in',
             labelForFormat: 'IN',
             formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-                if (valueSrc == 'value')
+                if (valueSrc === 'value')
                     return `${field} IN (${values.join(', ')})`;
                 else
                     return `${field} IN (${values})`;
@@ -627,7 +627,7 @@ export default {
             label: 'Not in',
             labelForFormat: 'NOT IN',
             formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-                if (valueSrc == 'value')
+                if (valueSrc === 'value')
                     return `${field} NOT IN (${values.join(', ')})`;
                 else
                     return `${field} NOT IN (${values})`;
@@ -637,12 +637,12 @@ export default {
         },
         multiselect_equals: {
             label: 'Equals',
-            labelForFormat: '==',
+            labelForFormat: '===',
             formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-                if (valueSrc == 'value')
-                    return `${field} == [${values.join(', ')}]`;
+                if (valueSrc === 'value')
+                    return `${field} === [${values.join(', ')}]`;
                 else
-                    return `${field} == ${values}`;
+                    return `${field} === ${values}`;
             },
             mongoFormatOp: (field, op, values) => ({ [field]: { '$eq': values } }),
             reversedOp: 'multiselect_not_equals',
@@ -651,7 +651,7 @@ export default {
             label: 'Not equals',
             labelForFormat: '!=',
             formatOp: (field, op, values, valueSrc, valueType, opDef, operatorOptions, isForDisplay) => {
-                if (valueSrc == 'value')
+                if (valueSrc === 'value')
                     return `${field} != [${values.join(', ')}]`;
                 else
                     return `${field} != ${values}`;

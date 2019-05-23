@@ -6,8 +6,8 @@ import AppHeader from './common/components/app-header/AppHeader';
 import SubHeader from './common/components/app-sub-header/SubHeader';
 import NewPush from './common/components/app-newPush/newPush'
 import SentNotification from './common/components/app-sent-notifcation/sent-notification'
-//import Audience from './common/components/app-audience/QueryBuilderWrapper'
-import Schedule from './common/components/app-schedule/schedule'
+import Audience from './common/components/app-audience/audience'
+import Schedule from './common/components/app-schedule-notification/schedule'
 import { notification } from 'antd';
 
 function Demo() {
@@ -26,9 +26,9 @@ function sentNotification(){
   return <SentNotification />
 }
 
-// function audience(){
-//   return <Audience />
-// }
+function audience(){
+  return <Audience />
+}
 
 function getToken() {
   return "token";
@@ -113,6 +113,10 @@ const routes = [
   {
     path: 'bots/:botId/push-notification/create',
     component: isLoggedIn(withParams(withDashboard(create))),
+  },
+  {
+    path: 'bots/:botId/push-notification/audience',
+    component: isLoggedIn(withParams(withDashboard(audience))),
   },
   {
     path: 'bots/:botId/push-notification/sent-notification',

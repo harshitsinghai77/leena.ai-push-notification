@@ -1,11 +1,10 @@
 import React, { Component  } from 'react';
 import '../../../project-bootstap'
-import { Form, Button, Typography, Card, Input, DatePicker } from 'antd';
+import { message, Form, Button, Typography, Card, Input, DatePicker } from 'antd';
 import SelectAudience from './newPush-component/selectAudience/selectAudience'
 
 import CustomAudience from './newPush-component/customAudience/customAudience'
 import QuerySelector from './newPush-component/querySelector/querySelector'
-import '../../../project-bootstap'
 
 const { Title } = Typography;
 
@@ -19,48 +18,63 @@ const OptionToComponentMap = {
 
 class CreatePush extends Component {
 
+  success = (text) => {
+    message.success(text);
+  };
+
+  error = (text) => {
+    message.error(text);
+  };
+
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
-          console.log("Done")
           const obj = {
             fixedTime: values.time.toString(),
-            contentType: values.select,
+            contentType: "custom",
             content: {
                 subject: values.subject,
                 message: values.message
             },
             audience: {
-                type: "custom",
-                customAudienceId: values.audienceType
+                type: values.select,
             },
             params: []
           }
+
+          if(values.select === "custom"){
+            Object.assign(obj.audience, {customAudienceId: values.audienceType} )
+          }
+
+          console.log(obj)
 
           window.axiosInstance.post('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications', obj )
             .then(response =>  {
               console.log(response)
               if(response.status === 200){
                 this.props.form.resetFields();
+                this.success(response.data.message)
+              }else {
+                this.error(this.response.data)
               }
             })
             .catch(error => {
-              console.log(error);
-          });
+              this.error("Internal Error")
+            });
       }
     });
   };  
 
   render() {
     
-      const { getFieldDecorator, getFieldValue,  } = this.props.form;
+      const { getFieldDecorator, getFieldValue } = this.props.form;
 
       const selectAudience = getFieldValue('select')
-      const audienceType =   getFieldValue('audienceType');
-      const messageValue =   getFieldValue('message');
-      const subjectValue =   getFieldValue('subject');
-      const time =           getFieldValue('time');
+      // const audienceType =   getFieldValue('audienceType');
+      // const messageValue =   getFieldValue('message');
+      // const subjectValue =   getFieldValue('subject');
+      // const time =           getFieldValue('time');
 
       return(
         <Card bodyStyle = {{margin: "auto",width: "50%",}} hoverable = {true}>

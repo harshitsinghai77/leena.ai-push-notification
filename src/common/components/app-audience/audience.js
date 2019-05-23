@@ -1,35 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Icon, Card, Tag } from 'antd';
+import { Table, Input, Button, Icon, Card } from 'antd';
 import Highlighter from 'react-highlight-words';
+import CreateAudience from './createAudience'
 import '../../../project-bootstap'
-import axios from 'axios';
 
-
-function SentNotification() {
+function Audience() {
     
     const [searchText, setSearchText] = useState('');
-    const [audience, setAudience] = useState([])
-    const [notification, setNotification] = useState([]);
-
-
-    function getNotification() {
-      return window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/sent-notifications');
-    }
-    
-    function getAudience() {
-      return window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences')
-    }
+    const [audience, setAudience] = useState([]);
 
 
     useEffect(() => {
+        window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences')
+            .then(response => {
+                setAudience(response.data.audiences)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    },[])
 
-        axios.all([getNotification(), getAudience()])
-        .then(axios.spread((acct, perms) => {
-          setNotification(acct.data.notifications)
-          setAudience(perms.data.audiences)
-        }));
-    }, [])
-   
+  
    const getColumnSearchProps = dataIndex => ({
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
         <div style={{ padding: 8 }}>
@@ -85,79 +76,84 @@ function SentNotification() {
       setSearchText('');
     };
 
-    const getAudienceName = (newId) => {
-        const value = audience.find(audience => audience._id === newId)
-        return value ? value.name : '';
-    } 
+    const onDone = () => {
+      window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences')
+      .then(response => {
+          setAudience(response.data.audiences)
+      })
+      .catch(error => {
+          console.log(error)
+      })
+    }
 
-    const getData =  notification.map((value,key) => {
+    const handleDelete = (key) => {
+      console.log(key)
+      window.axiosInstance.delete(`https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences/${key}`)
+        .then(response => {
+          console.log(response)
+          let arr = audience.filter(audience => audience._id !== key)
+          setAudience([ ...arr])
+        })
+        .catch(error => {
+          console.log("this is error")
+        })
+    }
+
+  
+    const getData =  audience.map((value,defaultKey) => {
         return (
             {
                 key: value._id,
-                id: key+1,
-                audience: getAudienceName(value.audience.customAudienceId),
-                message: value.content.message,
-                subject: value.content.subject,
-                status : [value.status],
-                time: new Date(value.updatedAt)
+                id: defaultKey+1,
+                name: value.name,
+                type: value.type,
+                createdAt : new Date(value.createdAt),
             }
         )
     })
-    
+
     const columns = [
         {
           title: 'Id',
           dataIndex: 'id',
           key: 'id',
+          width: 10,
           ...getColumnSearchProps('id'),
         },
         {
-          title: 'Audience',
-          dataIndex: 'audience',
-          key: 'audience',
-          ...getColumnSearchProps('audience'),
+          title: 'Name',
+          dataIndex: 'name',
+          width: 20,
+          key: 'name',
+          ...getColumnSearchProps('name'),
         },
         {
-          title: 'Message',
-          dataIndex: 'message',
-          key: 'message',
-          width: 200,
-          ...getColumnSearchProps('message'),
+          title: 'Type',
+          dataIndex: 'type',
+          key: 'type',
+          width: 50,
+          ...getColumnSearchProps('type'),
         },
         {
-          title: 'Subject',
-          dataIndex: 'subject',
-          key: 'subject',
-          width: 200,
-          ...getColumnSearchProps('subject'),
+            title: 'Created At',
+            dataIndex: 'createdAt',
+            width: 50,
+            key: 'createdAt',
+            ...getColumnSearchProps('createdAt'),
         },
         {
-            title: 'Status',
-            key: 'status',
-            dataIndex: 'status',
-            render: status => (
-              <span>
-                {status.map(status => {
-                  let color = status === "completed" ? 'green' : 'yello';
-                  return (
-                    <Tag color={color} key={status}>
-                      {status.toUpperCase()}
-                    </Tag>
-                  );
-                })}
-              </span>
-            ),
-          },
-          {
-            title: 'Time',
-            dataIndex: 'time',
-            key: 'time',
-            ...getColumnSearchProps('time'),
-          }
+          title: 'Action',
+          key: 'action',
+          width: 20,
+          render: (text) => (
+            <Icon type="delete" onClick = {() => handleDelete(text.key)} />
+          ),
+        }
       ];
       
       return (
-            <Card bodyStyle = {{margin: "auto",width: "80%",}} hoverable = {true} >
+            <Card bodyStyle = {{margin: "auto",width: "80%",}} hoverable = {true} hoverable = {true} >
+                <CreateAudience onDone = {onDone} />
                 <Table  columns={columns} 
                         dataSource={getData}
                         pagination={{ pageSize: 20 }}
@@ -167,4 +163,4 @@ function SentNotification() {
     }
   
 
-export default SentNotification;
+export default Audience;

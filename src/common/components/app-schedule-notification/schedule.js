@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Icon, Card, Tag } from 'antd';
+import { message, Table, Input, Button, Icon, Card, Tag } from 'antd';
 import Highlighter from 'react-highlight-words';
 import '../../../project-bootstap'
 import axios from 'axios';
@@ -11,9 +11,8 @@ function SentNotification() {
     const [audience, setAudience] = useState([])
     const [notification, setNotification] = useState([]);
 
-
     function getNotification() {
-      return window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/sent-notifications');
+      return window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications');
     }
     
     function getAudience() {
@@ -22,14 +21,17 @@ function SentNotification() {
 
 
     useEffect(() => {
-
         axios.all([getNotification(), getAudience()])
         .then(axios.spread((acct, perms) => {
           setNotification(acct.data.notifications)
           setAudience(perms.data.audiences)
         }));
     }, [])
-   
+
+    const successMessage = () => {
+      message.success("Notification has been cancelled");
+    };
+
    const getColumnSearchProps = dataIndex => ({
       filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
         <div style={{ padding: 8 }}>
@@ -85,11 +87,24 @@ function SentNotification() {
       setSearchText('');
     };
 
+    const handleDelete = (key) => {
+      window.axiosInstance.put(`https://dev.chatteron.io/api/bots/5ce100ae6d951400100308b9/notifications/${key}/cancel`)
+        .then(response => {
+          const tempIndex = notification.findIndex(notification => notification._id === key)
+          notification[tempIndex].status = "cancelled"
+          setNotification([ ...notification])
+          successMessage()
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    }
+
     const getAudienceName = (newId) => {
         const value = audience.find(audience => audience._id === newId)
-        return value ? value.name : '';
-    } 
-
+        return value ? value.name : 'Everyone';
+    }
+  
     const getData =  notification.map((value,key) => {
         return (
             {
@@ -99,21 +114,24 @@ function SentNotification() {
                 message: value.content.message,
                 subject: value.content.subject,
                 status : [value.status],
-                time: new Date(value.updatedAt)
+                pushTime: new Date(value.pushTime).toDateString(),
+                startTime: new Date(value.startTime).toDateString()
             }
         )
     })
-    
+
     const columns = [
         {
           title: 'Id',
           dataIndex: 'id',
           key: 'id',
+          width: 10,
           ...getColumnSearchProps('id'),
         },
         {
           title: 'Audience',
           dataIndex: 'audience',
+          width: 20,
           key: 'audience',
           ...getColumnSearchProps('audience'),
         },
@@ -121,24 +139,25 @@ function SentNotification() {
           title: 'Message',
           dataIndex: 'message',
           key: 'message',
-          width: 200,
+          width: 50,
           ...getColumnSearchProps('message'),
         },
         {
           title: 'Subject',
           dataIndex: 'subject',
           key: 'subject',
-          width: 200,
+          width: 50,
           ...getColumnSearchProps('subject'),
         },
         {
             title: 'Status',
+            width: 5,
             key: 'status',
             dataIndex: 'status',
             render: status => (
               <span>
                 {status.map(status => {
-                  let color = status === "completed" ? 'green' : 'yello';
+                  let color = status === "pending" ? 'yellow' : 'red';
                   return (
                     <Tag color={color} key={status}>
                       {status.toUpperCase()}
@@ -149,10 +168,26 @@ function SentNotification() {
             ),
           },
           {
-            title: 'Time',
-            dataIndex: 'time',
-            key: 'time',
-            ...getColumnSearchProps('time'),
+            title: 'Push Time',
+            dataIndex: 'pushTime',
+            width: 50,
+            key: 'pushTime',
+            ...getColumnSearchProps('pushTime'),
+          },
+          {
+            title: 'Start Time',
+            dataIndex: 'startTime',
+            key: 'startTime ',
+            width: 50,
+            ...getColumnSearchProps('startTime'),
+          },
+          {
+            title: 'Action',
+            key: 'action',
+            width: 20,
+            render: (text) => (
+              <Icon type="delete" onClick = {() => handleDelete(text.key)} />
+            ),
           }
       ];
       
@@ -161,7 +196,7 @@ function SentNotification() {
                 <Table  columns={columns} 
                         dataSource={getData}
                         pagination={{ pageSize: 20 }}
-                        />
+                />
             </Card>
         );
     }

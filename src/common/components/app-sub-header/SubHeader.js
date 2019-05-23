@@ -65,9 +65,9 @@ function AppSubHeader(props) {
   const currentTab = tabId || activity;
   return (
     <div className={styles.header} style={style}>
-      <Tabs activeKey={currentTab}>
+      <Tabs activeKey={currentTab} defaultActiveKey = "create" animated = {true} >
         {
-          TABS
+          TABS 
             .map(({ label, icon, actionUrl, key, selectedIcon }) => (
               <TabPane
                 key={key}
