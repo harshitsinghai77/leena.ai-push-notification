@@ -3,15 +3,16 @@ import { Table, Input, Button, Icon, Card } from 'antd';
 import Highlighter from 'react-highlight-words';
 import CreateAudience from './createAudience'
 import '../../../project-bootstap'
+import {ParamsContext} from '../../../Context' 
 
 function Audience() {
     
     const [searchText, setSearchText] = useState('');
     const [audience, setAudience] = useState([]);
-
-
+    const {botId} = React.useContext(ParamsContext) || {};
+    
     useEffect(() => {
-        window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences')
+        window.axiosInstance.get(`bots/${botId}/notifications/audiences`)
             .then(response => {
                 setAudience(response.data.audiences)
             })
@@ -76,30 +77,21 @@ function Audience() {
       setSearchText('');
     };
 
-    const onDone = () => {
-      window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences')
-      .then(response => {
-          setAudience(response.data.audiences)
-      })
-      .catch(error => {
-          console.log(error)
-      })
+    const onDone = (newAudience) => {
+      setAudience([ ...audience, newAudience ])
     }
 
     const handleDelete = (key) => {
-      console.log(key)
-      window.axiosInstance.delete(`https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences/${key}`)
+      window.axiosInstance.delete(`bots/${botId}/notifications/audiences/${key}`)
         .then(response => {
-          console.log(response)
           let arr = audience.filter(audience => audience._id !== key)
-          setAudience([ ...arr])
+          setAudience([...arr])
         })
         .catch(error => {
           console.log("this is error")
         })
     }
 
-  
     const getData =  audience.map((value,defaultKey) => {
         return (
             {
@@ -107,7 +99,7 @@ function Audience() {
                 id: defaultKey+1,
                 name: value.name,
                 type: value.type,
-                createdAt : new Date(value.createdAt),
+                createdAt : new Date(value.createdAt).toLocaleString(),
             }
         )
     })
@@ -117,13 +109,11 @@ function Audience() {
           title: 'Id',
           dataIndex: 'id',
           key: 'id',
-          width: 10,
           ...getColumnSearchProps('id'),
         },
         {
           title: 'Name',
           dataIndex: 'name',
-          width: 20,
           key: 'name',
           ...getColumnSearchProps('name'),
         },
@@ -131,13 +121,11 @@ function Audience() {
           title: 'Type',
           dataIndex: 'type',
           key: 'type',
-          width: 50,
           ...getColumnSearchProps('type'),
         },
         {
             title: 'Created At',
             dataIndex: 'createdAt',
-            width: 50,
             key: 'createdAt',
             ...getColumnSearchProps('createdAt'),
         },
@@ -152,7 +140,7 @@ function Audience() {
       ];
       
       return (
-            <Card bodyStyle = {{margin: "auto",width: "80%",}} hoverable = {true} hoverable = {true} >
+             <Card bodyStyle = {{margin: "auto",width: "80%"}} hoverable = {true}>
                 <CreateAudience onDone = {onDone} />
                 <Table  columns={columns} 
                         dataSource={getData}

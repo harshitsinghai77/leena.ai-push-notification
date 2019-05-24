@@ -3,6 +3,7 @@ import { message, Table, Input, Button, Icon, Card, Tag } from 'antd';
 import Highlighter from 'react-highlight-words';
 import '../../../project-bootstap'
 import axios from 'axios';
+import {ParamsContext} from '../../../Context'
 
 
 function SentNotification() {
@@ -10,13 +11,14 @@ function SentNotification() {
     const [searchText, setSearchText] = useState('');
     const [audience, setAudience] = useState([])
     const [notification, setNotification] = useState([]);
+    const {botId} = React.useContext(ParamsContext) || {};
 
     function getNotification() {
-      return window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications');
+      return window.axiosInstance.get(`bots/${botId}/notifications`);
     }
     
     function getAudience() {
-      return window.axiosInstance.get('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences')
+      return window.axiosInstance.get(`bots/${botId}/notifications/audiences`)
     }
 
 
@@ -88,7 +90,7 @@ function SentNotification() {
     };
 
     const handleDelete = (key) => {
-      window.axiosInstance.put(`https://dev.chatteron.io/api/bots/5ce100ae6d951400100308b9/notifications/${key}/cancel`)
+      window.axiosInstance.put(`bots/${botId}/notifications/${key}/cancel`)
         .then(response => {
           const tempIndex = notification.findIndex(notification => notification._id === key)
           notification[tempIndex].status = "cancelled"

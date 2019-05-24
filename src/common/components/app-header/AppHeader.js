@@ -3,6 +3,12 @@ import React from 'react';
 import {Avatar, Dropdown, Icon, Layout, Menu, Typography} from 'antd';
 import styles from './header.module.css';
 import {ParamsContext} from '../../../Context';
+import {
+  clearCurrentBot,
+  clearUserEmail,
+  clearUserId,
+  deleteToken,
+} from '../../../libs/storage/tokenStorage'
 
 const { Header } = Layout;
 
@@ -17,8 +23,11 @@ function AppHeader(props) {
       <Menu.Item
         key="1"
         onClick={() => {
+          deleteToken();
+          clearUserId();
+          clearCurrentBot();
+          clearUserEmail();
           navigate(`/login${window.location.search}`, { replace: true });
-          props.clearData();
         }}
       >
         <Icon type="poweroff" />

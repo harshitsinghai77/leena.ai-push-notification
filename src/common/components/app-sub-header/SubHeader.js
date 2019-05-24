@@ -60,8 +60,8 @@ const TABS = [
 ];
 
 function AppSubHeader(props) {
-  const { botId, roles, style } = props;
-  const { navigate, tabId, activity } = React.useContext(ParamsContext);
+  const { roles, style } = props;
+  const { navigate, tabId, activity, botId } = React.useContext(ParamsContext);
   const currentTab = tabId || activity;
   return (
     <div className={styles.header} style={style}>

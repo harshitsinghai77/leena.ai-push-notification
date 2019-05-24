@@ -1,34 +1,37 @@
-import React, { Component  } from 'react';
+import React from 'react';
 import '../../../project-bootstap'
 import { message, Form, Button, Typography, Card, Input, DatePicker } from 'antd';
-import SelectAudience from './newPush-component/selectAudience/selectAudience'
-
-import CustomAudience from './newPush-component/customAudience/customAudience'
-import QuerySelector from './newPush-component/querySelector/querySelector'
+import SelectAudience from './selectAudience'
+import queryBuilder from './queryBuilder'
+import {ParamsContext} from '../../../Context'
+import CustomAudience from './customAudience'
 
 const { Title } = Typography;
 
-const OPTIONS = ["everyone", "custom","filter"];
+const OPTIONS = ["everyone", "custom"];
+
 
 const OptionToComponentMap = {
   'custom':  <CustomAudience />,
-  'filter':  <QuerySelector />,
+  'filter':  <queryBuilder />,
   'everyone': null
 };
 
-class CreatePush extends Component {
+const CreatePush = (props) => {
 
-  success = (text) => {
+  const { botId } = React.useContext(ParamsContext) || {};
+
+  const success = (text) => {
     message.success(text);
   };
 
-  error = (text) => {
+  const error = (text) => {
     message.error(text);
   };
 
-  handleSubmit = e => {
+  const handleSubmit = e => {
     e.preventDefault();
-    this.props.form.validateFields((err, values) => {
+    props.form.validateFields((err, values) => {
       if (!err) {
           const obj = {
             fixedTime: values.time.toString(),
@@ -39,36 +42,28 @@ class CreatePush extends Component {
             },
             audience: {
                 type: values.select,
+                customAudienceId: values.select === "custom" ?  values.audienceType : undefined,
             },
             params: []
           }
 
-          if(values.select === "custom"){
-            Object.assign(obj.audience, {customAudienceId: values.audienceType} )
-          }
-
-          console.log(obj)
-
-          window.axiosInstance.post('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications', obj )
+          window.axiosInstance.post(`bots/${botId}/notifications`, obj )
             .then(response =>  {
-              console.log(response)
               if(response.status === 200){
-                this.props.form.resetFields();
-                this.success(response.data.message)
+                props.form.resetFields();
+                success(response.data.message)
               }else {
-                this.error(this.response.data)
+                error(response.data)
               }
             })
             .catch(error => {
-              this.error("Internal Error")
+              console.log(error)
             });
       }
     });
   };  
 
-  render() {
-    
-      const { getFieldDecorator, getFieldValue } = this.props.form;
+      const { getFieldDecorator, getFieldValue } = props.form;
 
       const selectAudience = getFieldValue('select')
       // const audienceType =   getFieldValue('audienceType');
@@ -78,14 +73,14 @@ class CreatePush extends Component {
 
       return(
         <Card bodyStyle = {{margin: "auto",width: "50%",}} hoverable = {true}>
-          <Form onSubmit={this.handleSubmit} className="login-form">
+          <Form onSubmit={handleSubmit} className="login-form">
             <Title level={4}>Select Audience</Title>
                 <Form.Item >
                       {
                         getFieldDecorator("select", {
                         rules: [{ required: true, message: 'Please select an audience'}],
                       })(
-                        <SelectAudience options = {OPTIONS} />
+                        <SelectAudience placeholder = {"Select an audience"} options = {OPTIONS} />
                       )}
                 </Form.Item>
 
@@ -132,7 +127,7 @@ class CreatePush extends Component {
         </Card>
       )
   }
-}
+
 
 const Create = Form.create({ name: 'normal_login' })(CreatePush);
 

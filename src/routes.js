@@ -4,36 +4,16 @@ import { Redirect } from '@reach/router';
 import styles from './index.module.css';
 import AppHeader from './common/components/app-header/AppHeader';
 import SubHeader from './common/components/app-sub-header/SubHeader';
+import { getToken, getCurrentBot } from './libs/storage/tokenStorage';
 import NewPush from './common/components/app-newPush/newPush'
 import SentNotification from './common/components/app-sent-notifcation/sent-notification'
 import Audience from './common/components/app-audience/audience'
 import Schedule from './common/components/app-schedule-notification/schedule'
-import { notification } from 'antd';
-
-function Demo() {
-  return <div>HELLO</div>;
-}
-
-function create(){
-  return <NewPush />
-}
-
-function schedule(){
-  return <Schedule />
-}
-
-function sentNotification(){
-  return <SentNotification />
-}
-
-function audience(){
-  return <Audience />
-}
-
-function getToken() {
-  return "token";
-}
-
+import LoginForm from './login-module/LoginPage';
+import ForgotPasswordForm from './login-module/components/ForgotPasswordForm';
+import ResetPassword from './login-module/components/ResetPassword';
+import Register from './login-module/components/Register';
+import Enterpassword from './login-module/components/Enterpassword';
 
 // function withPreLoad(WrapperComponent) {
 //   return props => (
@@ -60,7 +40,7 @@ function isLoggedIn(WrapperComponent, url) {
 
 function checkedLogedIn(WrapperComponent) {
   return (props) => {
-    if (getToken()) return <Redirect noThrow to="/" />;
+    if (getToken()) return <Redirect noThrow to={`bots/${getCurrentBot()}/push-notification/create`} />;
     return <WrapperComponent {...props} />;
   };
 }
@@ -78,53 +58,45 @@ function withDashboard(WrapperComponent) {
 }
 
 const routes = [
-  // {
-  //   path: '/',
-  //   component: checkedLogedIn(withParams(Demo)),
-  // },
-  // {
-  //   path: '/register',
-  //   component: withParams(Demo),
-  // },
-  // {
-  //   path: '/register-user',
-  //   component: withParams(Demo),
-  // },
-  // {
-  //   path: '/register-company',
-  //   component: withParams(Demo),
-  // },
-  // {
-  //   path: 'login',
-  //   component: checkedLogedIn(withParams(Demo)),
-  // },
-  // {
-  //   path: 'forgot-password',
-  //   component: Demo,
-  // },
-  // {
-  //   path: 'reset-password',
-  //   component: Demo,
-  // },
   {
     path: '/',
-    component: isLoggedIn(withParams(withDashboard(Demo))),
+    component: checkedLogedIn(withParams(LoginForm)),
+  },
+  {
+    path: '/register',
+    component: withParams(Register),
+  },
+  {
+    path: '/register-user',
+    component: withParams(Enterpassword),
+  },
+  {
+    path: 'login',
+    component: checkedLogedIn(withParams(LoginForm)),
+  },
+  {
+    path: 'forgot-password',
+    component: ForgotPasswordForm,
+  },
+  {
+    path: 'reset-password',
+    component: ResetPassword,
   },
   {
     path: 'bots/:botId/push-notification/create',
-    component: isLoggedIn(withParams(withDashboard(create))),
+    component: isLoggedIn(withParams(withDashboard(NewPush))),
   },
   {
     path: 'bots/:botId/push-notification/audience',
-    component: isLoggedIn(withParams(withDashboard(audience))),
+    component: isLoggedIn(withParams(withDashboard(Audience))),
   },
   {
     path: 'bots/:botId/push-notification/sent-notification',
-    component: isLoggedIn(withParams(withDashboard(sentNotification))),
+    component: isLoggedIn(withParams(withDashboard(SentNotification))),
   },
   {
     path: 'bots/:botId/push-notification/schedule',
-    component: isLoggedIn(withParams(withDashboard(schedule))),
+    component: isLoggedIn(withParams(withDashboard(Schedule))),
   },
 ];
 

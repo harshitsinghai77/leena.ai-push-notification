@@ -1,18 +1,20 @@
-import React, {useState, useEffect} from 'react'
+import React, {useState} from 'react'
 import { Modal, Button, Form, Input, Switch } from 'antd';
 import '../../../project-bootstap'
-import QuerySelector from '../app-newPush/newPush-component/querySelector/querySelector'
+import {ParamsContext} from '../../../Context'
+
 
 function CreateAudience(props) {
 
   const [visible , setVisible] = useState(false)
   const [confirmLoading , setConfirmLoading] = useState(false)
-
+  const { botId } = React.useContext(ParamsContext) || {};
+  
   const showModal = () => {
     setVisible(true);
   }
 
-  const handleOk = (e) => {
+  const onSubmit = (e) => {
     setConfirmLoading(true)
 
     e.preventDefault();
@@ -26,26 +28,25 @@ function CreateAudience(props) {
 
         }
       }
-      console.log(obj)
-
-      window.axiosInstance.post('https://dev.chatteron.io/api/bots/5ce25bf42424130017b8307a/notifications/audiences', obj)
+     
+      window.axiosInstance.post(`bots/${botId}/notifications/audiences`, obj)
         .then(response =>  {
-          console.log(response)
           props.form.resetFields();
           setConfirmLoading(false)
           setVisible(false)
+          props.onDone(response.data.audience);
         })
         .catch(error => {
           console.log(error)
         });
       }
-    })
-    props.onDone()
+    });
   };
 
   const handleCancel = () => {
     setVisible(false)
     setConfirmLoading(false)
+    props.form.resetFields();
   };
 
   const formItemLayout = {
@@ -69,11 +70,11 @@ function CreateAudience(props) {
         <Modal
           title="Create Audience"
           visible={visible}
-          onOk={handleOk}
           confirmLoading={confirmLoading}
           onCancel={handleCancel}
+          centered = {true}
         >
-                <Form  {...formItemLayout} >
+                <Form onSubmit = {onSubmit} {...formItemLayout} >
                   <Form.Item label="Name" >
                     {getFieldDecorator('name', {
                       rules: [{ required: true, message: 'Name of the audience' }],
@@ -91,7 +92,7 @@ function CreateAudience(props) {
                     )}
                   </Form.Item>
                   <Form.Item >
-                      {!queryBuilderToggle ? <QuerySelector /> : null }
+                      {!queryBuilderToggle ? "This is the query builder component" : null }
                   </Form.Item>
                 </Form>
         </Modal>
