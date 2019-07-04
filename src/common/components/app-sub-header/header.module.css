@@ -27,5 +27,6 @@
 }
 
 .tabItem img {
-    padding: 10px 0;
+    width: 35px;
+    padding-left: 10px
 }

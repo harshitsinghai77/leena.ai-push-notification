@@ -1,22 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { PageLoader } from 'leena-components';
 import { Router } from '@reach/router';
 import './index.css';
 import 'antd/dist/antd.css';
 import applicationRoutes from './routes';
 import * as serviceWorker from './serviceWorker';
-
-function PageNotFound(){
-  return <div>PageNotFound</div>;
-}
-
+import PageNotFound from './common/components/app-pageNotFound/PageNotFound';
 
 ReactDOM.render(
+  <React.Suspense fallback={<PageLoader />}>
     <Router style={{ minHeight: '100%', background: '#efefef' }}>
       {applicationRoutes}
       <PageNotFound default />
     </Router>
-    , document.getElementById('root'));
+  </React.Suspense>,
+  document.getElementById('root'),
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

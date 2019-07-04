@@ -1,170 +1,131 @@
-import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Icon, Card, Tag } from 'antd';
-import Highlighter from 'react-highlight-words';
-import '../../../project-bootstap'
-import axios from 'axios';
-import {ParamsContext} from '../../../Context'
+import React from 'react';
+import { Table, Card, Tag, Modal } from 'antd';
+import '../../../project-bootstap';
+import { ParamsContext } from '../../../Context';
+import View from '../app-view-details/view';
+
 
 function SentNotification() {
-    
-    const [searchText, setSearchText] = useState('');
-    const [audience, setAudience] = useState([])
-    const [notification, setNotification] = useState([]);
-    const {botId} = React.useContext(ParamsContext) || {};
-    
-    function getNotification() {
-      return window.axiosInstance.get(`bots/${botId}/sent-notifications`);
-    }
-    
-    function getAudience() {
-      return window.axiosInstance.get(`bots/${botId}/notifications/audiences`)
-    }
+  const [notification, setNotification] = React.useState([]);
+  const [modal, setModal] = React.useState(false);
+  const [viewData, setViewData] = React.useState(null);
+  const { botId } = React.useContext(ParamsContext) || {};
 
+  React.useEffect(() => {
+    window.axiosInstance.get(`api/bots/${botId}/sent-notifications`)
+      .then((response) => {
+        setNotification(response.data.notifications);
+      });
+  }, []);
 
-    useEffect(() => {
+  const shortenString = (str) => {
+    if (str.length > 200) return str.substring(0, 200).concat(' ....');
+    return str;
+  }
 
-        axios.all([getNotification(), getAudience()])
-        .then(axios.spread((acct, perms) => {
-          setNotification(acct.data.notifications)
-          setAudience(perms.data.audiences)
-        }));
-    }, [])
-   
-   const getColumnSearchProps = dataIndex => ({
-      filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-        <div style={{ padding: 8 }}>
-          <Input
-            placeholder={`Search ${dataIndex}`}
-            value={selectedKeys[0]}
-            onChange={e => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-            onPressEnter={() => handleSearch(selectedKeys, confirm)}
-            style={{ width: 188, marginBottom: 8, display: 'block' }}
-          />
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm)}
-            icon="search"
-            size="small"
-            style={{ width: 90, marginRight: 8 }}
-          >
-            Search
-          </Button>
-          <Button onClick={() => handleReset(clearFilters)} size="small" style={{ width: 90 }}>
-            Reset
-          </Button>
-        </div>
-      ),
-      filterIcon: filtered => (
-        <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
-      ),
-      onFilter: (value, record) =>
-        record[dataIndex]
-          .toString()
-          .toLowerCase()
-          .includes(value.toLowerCase()),
-        onFilterDropdownVisibleChange: visible => {
-       
-      },
-      render: text => (
-        <Highlighter
-          highlightStyle={{ backgroundColor: '#ffc069', padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text.toString()}
-        />
-      ),
-    });
-  
-    const handleSearch = (selectedKeys, confirm) => {
-      confirm();
-      setSearchText(selectedKeys[0]);
-    };
-  
-    const handleReset = clearFilters => {
-      clearFilters();
-      setSearchText('');
-    };
+  const getData = notification.map((value, key) => {
+    if (value.contentType !== 'custom') return;
+    return (
+      {
+        key: key + 1,
+        id: value._id,
+        recipients: value.numAllUsers,
+        message: shortenString(value.content.message),
+        subject: value.content.subject,
+        status: [value.status],
+        time: new Date(value.scheduleTime).toLocaleString(),
 
-    const getAudienceName = (newId) => {
-        const value = audience.find(audience => audience._id === newId)
-        return value ? value.name : '';
-    } 
-
-    const getData =  notification.map((value,key) => {
-        return (
-            {
-                key: value._id,
-                id: key+1,
-                audience: getAudienceName(value.audience.customAudienceId),
-                message: value.content.message,
-                subject: value.content.subject,
-                status : [value.status],
-                time: new Date(value.updatedAt)
-            }
-        )
-    })
-    
-    const columns = [
-        {
-          title: 'Id',
-          dataIndex: 'id',
-          key: 'id',
-          ...getColumnSearchProps('id'),
-        },
-        {
-          title: 'Audience',
-          dataIndex: 'audience',
-          key: 'audience',
-          ...getColumnSearchProps('audience'),
-        },
-        {
-          title: 'Message',
-          dataIndex: 'message',
-          key: 'message',
-          width: 200,
-          ...getColumnSearchProps('message'),
-        },
-        {
-          title: 'Subject',
-          dataIndex: 'subject',
-          key: 'subject',
-          width: 200,
-          ...getColumnSearchProps('subject'),
-        },
-        {
-            title: 'Status',
-            key: 'status',
-            dataIndex: 'status',
-            render: status => (
-              <span>
-                {status.map(status => {
-                  let color = status === "completed" ? 'green' : 'yello';
-                  return (
-                    <Tag color={color} key={status}>
-                      {status.toUpperCase()}
-                    </Tag>
-                  );
-                })}
-              </span>
-            ),
-          },
-          {
-            title: 'Time',
-            dataIndex: 'time',
-            key: 'time',
-            ...getColumnSearchProps('time'),
-          }
-      ];
-      
-      return (
-            <Card bodyStyle = {{margin: "auto",width: "80%",}} hoverable = {true} >
-                <Table  columns={columns} 
-                        dataSource={getData}
-                        pagination={{ pageSize: 20 }}
-                        />
-            </Card>
-        );
+        // Information required for view page
+        isPoll : value.content.isPoll,
+        completeMessage : value.content.message,
+        audienceType: value.audience.type,
+        numSuccess: value.numSuccess,
+        numFailed: value.numFailed,
+        option: value.content.pollOptions,
+        url: value.content.attachmentUrl
       }
-  
+    );
+  }).filter(item => item);
+
+  const ViewDetails = () => (
+    <Modal
+      centered
+      visible={modal}
+      closable
+      footer={null}
+      onCancel={() => setModal(false)}
+      width='70%'
+    >
+      <View data={viewData} />
+    </Modal>
+  );
+
+  const columns = [
+    {
+      title: 'Id',
+      dataIndex: 'key',
+      key: 'key',
+    },
+    {
+      title: 'Recipients',
+      dataIndex: 'recipients',
+      key: 'recipients',
+    },
+    {
+      title: 'Message',
+      dataIndex: 'message',
+      key: 'message',
+      width: 200,
+    },
+    {
+      title: 'Subject',
+      dataIndex: 'subject',
+      key: 'subject',
+      width: 200,
+    },
+    {
+      title: 'Status',
+      key: 'status',
+      dataIndex: 'status',
+      render: status => (
+        <span>
+          {status.map((status) => {
+            const color = status === 'completed' ? 'green' : 'yellow';
+            return (
+              <Tag color={color} key={status}>
+                {status.toUpperCase()}
+              </Tag>
+            );
+          })}
+        </span>
+      ),
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+    },
+  ];
+
+  return (
+    <Card bodyStyle={{ margin: 'auto', width: '80%' }} hoverable>
+      <Table
+        style={{ margin: 0 }}
+        onRow={rowValue => ({
+          onClick: () => {
+            setModal(true);
+            setViewData(rowValue);
+          },
+        })}
+        columns={columns}
+        scroll={{ x: '100% ' }}
+        dataSource={getData}
+        pagination={{ pageSize: 20 }}
+      />
+      {<ViewDetails />}
+    </Card>
+  );
+}
+
 
 export default SentNotification;

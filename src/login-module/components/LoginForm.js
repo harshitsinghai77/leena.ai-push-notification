@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from '@reach/router';
 import { Button, Form, Input, Typography } from 'antd';
+
 import style from './login.module.css';
 import logo from './assests/logo.svg';
 import { ParamsContext } from '../../Context';
@@ -23,8 +24,8 @@ function LoginForm(props) {
         loginUser(values)
           .then((res) => {
             saveToken(res.data.user.token);
-            setCurrentBot(res.data.user.bots[0]._id)
-            navigate(`/bots/${res.data.user.bots[0]._id}/push-notification/create`, { replace: true })
+            setCurrentBot(res.data.user.bots[0].botId);
+            navigate(`/bots/${res.data.user.bots[0].botId}/push-notification/create`, { replace: true });
           })
           .catch((apiErr) => {
             // notification.error({
@@ -70,7 +71,6 @@ function LoginForm(props) {
             LOG IN
           </Button>
           <div className={style.links}>
-            <Link to="/register" href="">New User? Register</Link>
             <Link to="/forgot-password" href="">Forgot password</Link>
           </div>
         </FormItem>

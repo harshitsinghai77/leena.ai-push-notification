@@ -1,19 +1,24 @@
 /* global window */
 
-const LOGIN_URL = 'notifications/users/login';
-const REGISTER_URL = 'tickets/users/register';
-const REGISTER_COMPANY_URL = 'tickets/users/company';
-const FORGET_PASSWORD_URL = 'tickets/users/forgot-password';
-const SAVE_PASSWORD_URL = 'tickets/users/update-password';
+const LOGIN_URL = 'api/notifications/users/login';
+const FORGET_PASSWORD_URL = 'api/users/forgot-password';
+const RESET_PASSWORD_URL = 'api/users/reset-password';
 
-export const registerUser = ({ email }) => window.axiosInstance.post(REGISTER_URL, { email });
+export const loginUser = ({ email, password }) => window.axiosInstance.post(LOGIN_URL, { email: email.trim(), password });
 
-export const registerCompany = payload => window.axiosInstance.put(REGISTER_COMPANY_URL, payload);
+/**
+ * API to hit when user clicks on 'forgot password'
+ * @param email
+ * @returns {AxiosPromise<any>}
+ */
+export const forgetPassword = ({ email }) => {
+  const apiUrl = `${FORGET_PASSWORD_URL}?email=${email}&app=notification`;
+  return window.axiosInstance.post(apiUrl);
+};
 
-export const savePassword = payload => window.axiosInstance.put(SAVE_PASSWORD_URL, payload);
-
-export const loginUser = ({ email, password }) => window.axiosInstance.post(LOGIN_URL, { email, password });
-
-export const forgetPassword = ({ email }) => window.axiosInstance.post(`${FORGET_PASSWORD_URL}?email=${email}`);
-
-export const resetPassword = payload => window.axiosInstance.put(SAVE_PASSWORD_URL, payload);
+/**
+ * API to update password after user has clicked on 'forgot password'
+ * @param payload
+ * @returns {AxiosPromise<any>}
+ */
+export const resetPassword = payload => window.axiosInstance.post(RESET_PASSWORD_URL, payload);

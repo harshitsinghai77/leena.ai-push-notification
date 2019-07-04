@@ -4,76 +4,65 @@ import { Tabs } from 'antd';
 import styles from './header.module.css';
 import { ParamsContext } from '../../../Context';
 import './tabs.css';
-import openTickets from './assests/open-tickets.svg';
-import openTicketsHighlighted from './assests/open-tickets-highlighted.svg';
-import closeTickets from './assests/close-tickets.svg';
-import closeTicketsHighlighted from './assests/close-tickets-highlighted.svg';
-import category from './assests/category.svg';
-import categoryHighlighted from './assests/category-highlighted.svg';
-import users from './assests/users.svg';
-import usersHighlighted from './assests/users-highlighted.svg';
+import ScheduleSVG from './assests/calendar.svg';
+import CancelledSVG from './assests/cancel.svg';
+import CreatePushSVG from './assests/push.svg';
+import SentSVG from './assests/sent.svg';
+import AudienceSVG from './assests/audience.svg';
 
 const { TabPane } = Tabs;
 
 const TABS = [
   {
     label: 'Create',
-    key: 'create',
     actionUrl: '/push-notification/create',
-    icon: openTickets,
-    selectedIcon: openTicketsHighlighted,
+    key: 'create',
+    icon: CreatePushSVG,
   },
   {
     label: 'Scheduled',
-    key: 'schedule',
     actionUrl: '/push-notification/schedule',
-    icon: closeTickets,
-    selectedIcon: closeTicketsHighlighted,
+    key: 'schedule',
+    icon: ScheduleSVG,
   },
   {
     label: 'Sent',
     actionUrl: '/push-notification/sent-notification',
-    activity: 'categories',
-    key: 'sent',
-    role: 'settings',
-    icon: category,
-    selectedIcon: categoryHighlighted,
+    key: 'sent-notification',
+    icon: SentSVG,
   },
   {
     label: 'Cancelled',
-    actionUrl: '/settings/users',
-    activity: 'users',
-    key: 'cancelled',
-    role: 'settings',
-    icon: users,
-    selectedIcon: usersHighlighted,
+    actionUrl: '/push-notification/cancelled-notification',
+    key: 'cancelled-notification',
+    icon: CancelledSVG,
   },
   {
     label: 'Audience',
     actionUrl: '/push-notification/audience',
-    activity: 'users',
     key: 'audience',
-    role: 'settings',
-    icon: users,
-    selectedIcon: usersHighlighted,
+    icon: AudienceSVG,
   },
 ];
 
 function AppSubHeader(props) {
-  const { roles, style } = props;
-  const { navigate, tabId, activity, botId } = React.useContext(ParamsContext);
-  const currentTab = tabId || activity;
+  const { style } = props;
+  const { navigate, tabId, botId, uri } = React.useContext(ParamsContext);
+
+  const n = uri.lastIndexOf('/');
+  const currentTab = uri.substring(n + 1);
+
   return (
     <div className={styles.header} style={style}>
-      <Tabs activeKey={currentTab} defaultActiveKey = "create" animated = {true} >
+      <Tabs activeKey={currentTab}>
         {
-          TABS 
+          TABS
             .map(({ label, icon, actionUrl, key, selectedIcon }) => (
               <TabPane
                 key={key}
                 tab={(
-                  <span onClick={e => navigate(`/bots/${botId}${actionUrl}`)} className={styles.tabItem}>
-                    <img src={currentTab === key ? selectedIcon : icon} />
+                  <span onClick={() => navigate(`/bots/${botId}${actionUrl}`)} className={styles.tabItem}>
+                    <img src={icon} />
                     {label}
                   </span>
             )}
@@ -85,4 +74,4 @@ function AppSubHeader(props) {
   );
 }
 
-export default AppSubHeader;
+export default React.memo(AppSubHeader);

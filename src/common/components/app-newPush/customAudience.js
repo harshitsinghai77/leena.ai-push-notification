@@ -1,45 +1,51 @@
-import React, {useState , useEffect, forwardRef} from 'react';
+import React from 'react';
 import { Select } from 'antd';
-import '../../../project-bootstap'
-import {ParamsContext} from '../../../Context'
-const Option = Select.Option;
+import '../../../project-bootstap';
+import { ParamsContext } from '../../../Context';
 
-function CustomAudience(props , ref) {
+function CustomAudience(props, ref) {
+  const [option, setOption] = React.useState([]);
+  const { botId } = React.useContext(ParamsContext) || {};
+  const [loading, setLoading] = React.useState(true);
+  const [value, setValue] = React.useState('');
 
-    const [option, setOption] = useState([])
-    const { botId } = React.useContext(ParamsContext) || {};
-
-    useEffect(() => {
-        window.axiosInstance.get(`bots/${botId}/notifications/audiences`)
-        .then(response =>  {
-          setOption(response.data.audiences)
-        })
-        .catch(error => {
-          console.log(error);
+  React.useEffect(() => {
+    window.axiosInstance.get(`api/bots/${botId}/notifications/audiences`)
+      .then((response) => {
+        const { audiences } = response.data;
+        setOption(audiences);
+        setLoading(false);
+        if (Array.isArray(audiences) && audiences[0]) return onChange(audiences[0]._id);
       });
-    },[])
+  }, []);
 
-    const getOptions = option.map((value) => {
-      return(
-        <Option key = {value._id} value = {value._id}>{value.name}</Option>
+
+  const Options = option.map(value => (
+    <Select.Option key={value._id} value={value._id}>
+      {value.name}
+      {' '}
+      (
+      {value.numTotal}
       )
-  })
-  
-    return (
-        <div ref={ref}>
-          <Select
-            showSearch
-            placeholder="Select a Audience"
-            optionFilterProp="children"
-            onChange={props.onChange}
-            filterOption={(input, option) =>
-            option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-            }
-          >
-            {getOptions}
-          </Select>
-        </div>
-    )
+    </Select.Option>
+  ));
+
+  const onChange = (value) => {
+    setValue(value);
+    props.onChange(value);
+  };
+
+  return (
+    <Select
+      ref={ref}
+      placeholder="Select a Audience"
+      onChange={onChange}
+      loading={loading}
+      value={value}
+    >
+      {Options}
+    </Select>
+  );
 }
 
-export default forwardRef(CustomAudience);
+export default React.forwardRef(CustomAudience);

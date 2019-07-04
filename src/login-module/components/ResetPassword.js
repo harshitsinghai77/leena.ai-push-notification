@@ -2,15 +2,11 @@
 import React from 'react';
 import qs from 'query-string';
 import { navigate } from '@reach/router';
-import { Button, Form, Input, notification, Typography } from 'antd';
+import { Button, Form, Input, Typography } from 'antd';
 import style from './login.module.css';
 import logo from './assests/logo.svg';
 import { resetPassword } from '../actions/login-action';
-import {
-  saveToken,
-  setCurrentBot,
-  setUserId,
-} from '../../libs/storage/tokenStorage';
+import { saveToken } from '../../libs/storage/tokenStorage';
 
 const FormItem = Form.Item;
 

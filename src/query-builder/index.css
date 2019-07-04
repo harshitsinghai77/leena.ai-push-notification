@@ -1,0 +1,60 @@
+.rule,
+.ruleGroup .ruleGroup {
+    margin-top: 0.5rem;
+    /*margin-left: 0.5rem;*/
+}
+
+.ruleGroup {
+    padding: 0.5rem;
+    border: 1px solid #000;
+    border-radius: 5px;
+    background: #fafafa;
+
+}
+
+.combinators {
+
+}
+
+.ruleGroup {
+    border: 1px solid #cacaca;
+}
+
+.rule-fields {
+    max-width: 30%;
+    min-width: 30%;
+}
+
+.rule-operators {
+    max-width: 30%;
+    min-width: 30%;
+}
+
+.addRule {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.removeRule {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.addGroup {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.combinators {
+
+}
+
+.rule {
+    display: flex;
+    height: 36px;
+}
+
+.operators {
+    margin-left: 10px;
+    margin-right: 10px;
+}
